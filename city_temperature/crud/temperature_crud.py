@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from city_temperature import models, schemas
+from city_temperature.models.temperature import Temperature
+from city_temperature import schemas
 
 
 def create_temperature(db: Session, temperature: schemas.temperature.TemperatureCreate):
-    db_temp = models.temperature.Temperature(
+    db_temp = Temperature(
         city_id=temperature.city_id,
         temperature=temperature.temperature
     )
@@ -14,10 +15,8 @@ def create_temperature(db: Session, temperature: schemas.temperature.Temperature
 
 
 def get_all_temperatures(db: Session):
-    return db.query(models.temperature.Temperature).all()
+    return db.query(Temperature).all()
 
 
 def get_temperatures_by_city(db: Session, city_id: int):
-    return db.query(models.temperature.Temperature).filter(
-        models.temperature.Temperature.city_id == city_id
-    ).all()
+    return db.query(Temperature).filter(Temperature.city_id == city_id).all()

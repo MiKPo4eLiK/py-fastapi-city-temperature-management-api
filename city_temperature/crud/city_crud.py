@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
-from city_temperature import models, schemas
+from city_temperature.models.city import City
+from city_temperature import schemas
 
 
 def create_city(db: Session, city: schemas.city.CityCreate):
-    db_city = models.city.City(
+    db_city = City(
         name=city.name,
         additional_info=city.additional_info
     )
@@ -14,11 +15,11 @@ def create_city(db: Session, city: schemas.city.CityCreate):
 
 
 def get_cities(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.city.City).offset(skip).limit(limit).all()
+    return db.query(City).offset(skip).limit(limit).all()
 
 
 def get_city(db: Session, city_id: int):
-    return db.query(models.city.City).filter(models.city.City.id == city_id).first()
+    return db.query(City).filter(City.id == city_id).first()
 
 
 def update_city(db: Session, city_id: int, city_update: schemas.city.CityCreate):
@@ -39,3 +40,4 @@ def delete_city(db: Session, city_id: int):
     db.delete(db_city)
     db.commit()
     return db_city
+
