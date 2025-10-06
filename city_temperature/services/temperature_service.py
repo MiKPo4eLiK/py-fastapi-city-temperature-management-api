@@ -2,17 +2,20 @@ import httpx
 from typing import Optional
 
 
-async def fetch_temperature(city_name: str) -> Optional[float]:
-    url = (
-        f"https://api.open-meteo.com/v1/forecast"
-        f"?current_weather=true&latitude=50.45&longitude=30.52"
-    )
+BASE_WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
+TIMEOUT = 5.0
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        data = response.json()
 
+async def fetch_temperature(latitude: float, longitude: float) -> Optional[float]:
+    url = f"{BASE_WEATHER_URL}?current_weather=true&latitude={latitude}&longitude={longitude}"
     try:
-        return data["current_weather"]["temperature"]
-    except KeyError:
+        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            try:
+                data = response.json()
+            except ValueError:
+                return None
+            return data.get("current_weather", {}).get("temperature")
+    except (httpx.RequestError, httpx.HTTPStatusError):
         return None
